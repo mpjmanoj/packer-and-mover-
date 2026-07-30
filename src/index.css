@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#F8FAFC] text-[#1E293B];
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #EAF4FF;
+}
+::-webkit-scrollbar-thumb {
+  background: #93C5FD;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2563EB;
+}
+
+/* Glassmorphism class */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* Moving Road Lines animation */
+@keyframes moveRoad {
+  0% { background-position: 0 0; }
+  100% { background-position: -40px 0; }
+}
+
+.animate-road {
+  background-image: repeating-linear-gradient(90deg, #2563EB 0, #2563EB 20px, transparent 20px, transparent 40px);
+  animation: moveRoad 1s linear infinite;
+}
