@@ -3,7 +3,7 @@ import { InventoryItemDef, InventoryCategory } from '../types';
 export const INVENTORY_CATEGORIES: InventoryCategory[] = [
   'Kitchen',
   'Bedroom',
-  | 'Living Room',
+  'Living Room',
   'Electronics',
   'Office Items',
   'Others'
