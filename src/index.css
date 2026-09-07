@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-padding-top: 112px; /* Offset for the sticky header */
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-[#F8FAFC] text-[#1E293B];
   }

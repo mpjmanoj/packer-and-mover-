@@ -224,28 +224,52 @@ export const Hero: React.FC<HeroProps> = ({ onBookClick }) => {
                   <rect x="400" y="215" width="12" height="18" rx="3" fill="#64748B" />
 
                   {/* Truck Wheels (Animated Rotation) */}
-                  <g className="animate-spin origin-[110px_230px]" style={{ animationDuration: '3s' }}>
+                  <g>
                     <circle cx="110" cy="230" r="28" fill="#1E293B" />
                     <circle cx="110" cy="230" r="16" fill="#94A3B8" />
                     <circle cx="110" cy="230" r="6" fill="#FFFFFF" />
                     <line x1="110" y1="202" x2="110" y2="258" stroke="#1E293B" strokeWidth="3" />
                     <line x1="82" y1="230" x2="138" y2="230" stroke="#1E293B" strokeWidth="3" />
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      from="0 110 230"
+                      to="360 110 230"
+                      dur="3s"
+                      repeatCount="indefinite"
+                    />
                   </g>
 
-                  <g className="animate-spin origin-[250px_230px]" style={{ animationDuration: '3s' }}>
+                  <g>
                     <circle cx="250" cy="230" r="28" fill="#1E293B" />
                     <circle cx="250" cy="230" r="16" fill="#94A3B8" />
                     <circle cx="250" cy="230" r="6" fill="#FFFFFF" />
                     <line x1="250" y1="202" x2="250" y2="258" stroke="#1E293B" strokeWidth="3" />
                     <line x1="222" y1="230" x2="278" y2="230" stroke="#1E293B" strokeWidth="3" />
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      from="0 250 230"
+                      to="360 250 230"
+                      dur="3s"
+                      repeatCount="indefinite"
+                    />
                   </g>
 
-                  <g className="animate-spin origin-[360px_230px]" style={{ animationDuration: '3s' }}>
+                  <g>
                     <circle cx="360" cy="230" r="28" fill="#1E293B" />
                     <circle cx="360" cy="230" r="16" fill="#94A3B8" />
                     <circle cx="360" cy="230" r="6" fill="#FFFFFF" />
                     <line x1="360" y1="202" x2="360" y2="258" stroke="#1E293B" strokeWidth="3" />
                     <line x1="332" y1="230" x2="388" y2="230" stroke="#1E293B" strokeWidth="3" />
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      from="0 360 230"
+                      to="360 360 230"
+                      dur="3s"
+                      repeatCount="indefinite"
+                    />
                   </g>
 
                   {/* Gradient Definitions */}
