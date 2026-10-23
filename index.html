@@ -288,12 +288,46 @@
           )}
 
           <FooterSection onScrollTo={scrollTo} onOpenAdmin={() => setIsAdminView(true)} />
+
+          {/* Floating WhatsApp Button */}
+          <a
+            href="https://wa.me/919876543210?text=Hi%20Hassan%20Packers,%20I%20want%20a%20quote"
+            target="_blank"
+            rel="noreferrer"
+            className="fixed bottom-20 lg:bottom-6 right-4 z-40 w-14 h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg shadow-emerald-500/30 flex items-center justify-center transition-all hover:scale-110"
+            aria-label="Chat on WhatsApp"
+          >
+            <i data-lucide="message-circle" className="w-7 h-7"></i>
+          </a>
+
+          {/* Mobile Sticky Bottom CTA Bar */}
+          <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white border-t border-slate-200 shadow-[0_-4px_12px_rgba(0,0,0,0.1)] px-4 py-3 flex gap-3">
+            <a
+              href="tel:+919876543210"
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#1E293B] text-white font-bold text-sm"
+            >
+              <i data-lucide="phone" className="w-4 h-4"></i> Call Now
+            </a>
+            <button
+              onClick={() => { const el = document.getElementById('hero-stage'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2563EB] text-white font-bold text-sm"
+            >
+              <i data-lucide="calendar" className="w-4 h-4"></i> Book Now
+            </button>
+          </div>
         </div>
       );
     }
 
     // --- NAVBAR ---
     function Navbar({ onOpenAdmin, isAdminActive, onScrollTo }) {
+      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+      const handleNavClick = (id) => {
+        setMobileMenuOpen(false);
+        onScrollTo(id);
+      };
+
       return (
         <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-xs">
           <div className="bg-[#1E293B] text-slate-300 text-xs py-1.5 px-4">
@@ -315,7 +349,7 @@
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-20">
-              <div onClick={() => onScrollTo('hero-stage')} className="flex items-center gap-3 cursor-pointer group">
+              <div onClick={() => handleNavClick('hero-stage')} className="flex items-center gap-3 cursor-pointer group">
                 <div className="w-12 h-12 rounded-2xl bg-[#2563EB] flex items-center justify-center text-white shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-transform">
                   <i data-lucide="truck" className="w-6 h-6"></i>
                 </div>
@@ -331,12 +365,12 @@
               </div>
 
               <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-slate-600">
-                <button onClick={() => onScrollTo('hero-stage')} className="hover:text-[#2563EB] transition-colors">Home</button>
-                <button onClick={() => onScrollTo('how-it-works')} className="hover:text-[#2563EB] transition-colors">How It Works</button>
-                <button onClick={() => onScrollTo('why-us')} className="hover:text-[#2563EB] transition-colors">Why Choose Us</button>
-                <button onClick={() => onScrollTo('about')} className="hover:text-[#2563EB] transition-colors">About Us</button>
-                <button onClick={() => onScrollTo('reviews')} className="hover:text-[#2563EB] transition-colors">Reviews</button>
-                <button onClick={() => onScrollTo('contact')} className="hover:text-[#2563EB] transition-colors">Contact</button>
+                <button onClick={() => handleNavClick('hero-stage')} className="hover:text-[#2563EB] transition-colors">Home</button>
+                <button onClick={() => handleNavClick('how-it-works')} className="hover:text-[#2563EB] transition-colors">How It Works</button>
+                <button onClick={() => handleNavClick('why-us')} className="hover:text-[#2563EB] transition-colors">Why Choose Us</button>
+                <button onClick={() => handleNavClick('about')} className="hover:text-[#2563EB] transition-colors">About Us</button>
+                <button onClick={() => handleNavClick('reviews')} className="hover:text-[#2563EB] transition-colors">Reviews</button>
+                <button onClick={() => handleNavClick('contact')} className="hover:text-[#2563EB] transition-colors">Contact</button>
               </nav>
 
               <div className="flex items-center gap-3">
@@ -348,9 +382,47 @@
                 >
                   <i data-lucide="message-square" className="w-4 h-4"></i> WhatsApp
                 </a>
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="lg:hidden p-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50"
+                  aria-label="Toggle menu"
+                >
+                  <i data-lucide={mobileMenuOpen ? "x" : "menu"} className="w-6 h-6"></i>
+                </button>
               </div>
             </div>
           </div>
+
+          {mobileMenuOpen && (
+            <div className="lg:hidden bg-white border-t border-slate-100 shadow-lg">
+              <nav className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
+                {[
+                  ['hero-stage', 'Home'],
+                  ['how-it-works', 'How It Works'],
+                  ['why-us', 'Why Choose Us'],
+                  ['about', 'About Us'],
+                  ['reviews', 'Reviews'],
+                  ['contact', 'Contact']
+                ].map(([id, label]) => (
+                  <button
+                    key={id}
+                    onClick={() => handleNavClick(id)}
+                    className="text-left px-4 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-[#EAF4FF] hover:text-[#2563EB] transition-colors"
+                  >
+                    {label}
+                  </button>
+                ))}
+                <a
+                  href="https://wa.me/919876543210?text=Hi%20Hassan%20Packers,%20I%20want%20a%20quote"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-emerald-600 hover:bg-emerald-50 transition-colors sm:hidden"
+                >
+                  <i data-lucide="message-square" className="w-4 h-4"></i> WhatsApp Us
+                </a>
+              </nav>
+            </div>
+          )}
         </header>
       );
     }
@@ -413,9 +485,10 @@
       const truckDriveX = moveProgress * 280; // Moves to the right
       const wheelRotation = moveProgress * 720; // Wheels rotate
 
-      const optionsOpacity = optionsProgress;
-      const optionsYOffset = (1 - optionsProgress) * 50;
-      const optionsScale = 0.85 + (optionsProgress * 0.15);
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+      const optionsOpacity = isMobile ? 1 : optionsProgress;
+      const optionsYOffset = isMobile ? 0 : (1 - optionsProgress) * 50;
+      const optionsScale = isMobile ? 1 : 0.85 + (optionsProgress * 0.15);
 
       const handleConfirmPayment = (txId, cost) => {
         const bId = 'HPM-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
@@ -449,10 +522,10 @@
               <span className="text-xs font-extrabold uppercase tracking-wider text-[#2563EB] bg-[#EAF4FF] px-4 py-1.5 rounded-full border border-blue-200">
                 Hassan Packers &amp; Movers
               </span>
-              <h1 className="text-3xl sm:text-5xl font-black text-[#1E293B]">
+              <h1 className="text-2xl sm:text-3xl lg:text-5xl font-black text-[#1E293B]">
                 Safe &amp; Reliable Shifting Services
               </h1>
-              <p className="text-slate-500 text-sm font-medium">
+              <p className="text-slate-500 text-base sm:text-sm font-medium">
                 Professional household moving within Hassan and to any city across India.
               </p>
 
@@ -806,7 +879,7 @@
                     key={ht}
                     type="button"
                     onClick={() => onChange({ houseType: ht })}
-                    className={`py-2 rounded-xl text-[11px] font-bold border ${
+                    className={`py-3 sm:py-2 rounded-xl text-[11px] font-bold border ${
                       details.houseType === ht ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-white text-slate-700 border-slate-200'
                     }`}
                   >
@@ -827,7 +900,7 @@
                     key={fl}
                     type="button"
                     onClick={() => onChange({ currentFloor: fl })}
-                    className={`py-1.5 rounded-lg text-[10px] font-bold border ${
+                    className={`py-2.5 sm:py-1.5 rounded-lg text-[10px] font-bold border ${
                       details.currentFloor === fl ? 'bg-slate-800 text-white' : 'bg-white text-slate-600'
                     }`}
                   >
@@ -845,7 +918,7 @@
                     key={fl}
                     type="button"
                     onClick={() => onChange({ destFloor: fl })}
-                    className={`py-1.5 rounded-lg text-[10px] font-bold border ${
+                    className={`py-2.5 sm:py-1.5 rounded-lg text-[10px] font-bold border ${
                       details.destFloor === fl ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600'
                     }`}
                   >
@@ -907,7 +980,7 @@
               return (
                 <div
                   key={item.id}
-                  className={`p-3 rounded-2xl border flex items-center justify-between transition-all ${
+                  className={`p-3 rounded-2xl border flex items-center justify-between transition-all min-h-[56px] ${
                     qty > 0 ? 'bg-blue-50/60 border-[#2563EB]' : 'bg-white border-slate-200'
                   }`}
                 >
@@ -1339,9 +1412,9 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
                 <h2 className="text-3xl font-black">Need Help? Call Us Today</h2>
                 <p className="text-blue-100 text-xs mt-1">Our Hassan office team is ready to assist you 24/7.</p>
               </div>
-              <div className="flex gap-3">
-                <a href="tel:+919876543210" className="px-6 py-3.5 bg-white text-[#2563EB] font-extrabold rounded-2xl shadow">Call Now</a>
-                <a href="https://wa.me/919876543210" target="_blank" className="px-6 py-3.5 bg-emerald-500 text-white font-extrabold rounded-2xl shadow">WhatsApp</a>
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <a href="tel:+919876543210" className="px-6 py-3.5 bg-white text-[#2563EB] font-extrabold rounded-2xl shadow text-center">Call Now</a>
+                <a href="https://wa.me/919876543210" target="_blank" className="px-6 py-3.5 bg-emerald-500 text-white font-extrabold rounded-2xl shadow text-center">WhatsApp</a>
               </div>
             </div>
 
@@ -1370,7 +1443,7 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
     // --- FOOTER SECTION ---
     function FooterSection({ onScrollTo, onOpenAdmin }) {
       return (
-        <footer className="bg-[#1E293B] text-slate-400 py-12 text-xs border-t border-slate-800">
+        <footer className="bg-[#1E293B] text-slate-400 py-12 pb-24 lg:pb-12 text-xs border-t border-slate-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
               <p className="font-bold text-white text-base">HASSAN PACKERS &amp; MOVERS</p>
@@ -1513,8 +1586,8 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
               </div>
             </div>
 
-            <div className="bg-slate-800 rounded-3xl border border-slate-700 overflow-hidden shadow-2xl text-xs">
-              <table className="w-full text-left">
+            <div className="bg-slate-800 rounded-3xl border border-slate-700 overflow-hidden shadow-2xl text-xs overflow-x-auto">
+              <table className="w-full text-left min-w-[700px]">
                 <thead className="bg-slate-900 text-slate-400 uppercase text-[10px] font-bold">
                   <tr>
                     <th className="px-6 py-4">Booking ID</th>
