@@ -117,6 +117,91 @@
     ::-webkit-scrollbar-track { background: #FFFFFF; }
     ::-webkit-scrollbar-thumb { background: #93C5FD; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #2563EB; }
+
+    /* Apple-style spring-feel transitions */
+    .apple-press { transition: transform 0.1s cubic-bezier(0.25, 0.1, 0.25, 1); }
+    .apple-press:active { transform: scale(0.97); }
+
+    /* Translucent glass material */
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+    }
+    .glass-nav-dark {
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(16px) saturate(150%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+    }
+    .glass-modal-bg {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* Smooth spring-feel hover lift */
+    .apple-lift {
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .apple-lift:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.12), 0 8px 16px -8px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Fade-in-up animation for sections */
+    .apple-fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
+                  transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    .apple-fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Typography: tighten large headings */
+    .apple-display {
+      letter-spacing: -0.025em;
+      line-height: 1.08;
+      font-optical-sizing: auto;
+    }
+    .apple-title {
+      letter-spacing: -0.015em;
+      line-height: 1.15;
+    }
+
+    /* Scroll edge fade instead of hard border */
+    .scroll-edge-fade::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 24px;
+      background: linear-gradient(to top, white, transparent);
+      pointer-events: none;
+    }
+
+    /* Reduced motion: cross-fade only */
+    @media (prefers-reduced-motion: reduce) {
+      .apple-lift, .apple-press, .apple-fade-in {
+        transition: opacity 0.2s ease !important;
+        transform: none !important;
+      }
+      .apple-fade-in { opacity: 1; }
+      * { scroll-behavior: auto !important; }
+    }
+
+    /* Reduced transparency */
+    @media (prefers-reduced-transparency: reduce) {
+      .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: none; }
+      .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: none; }
+    }
   </style>
 </head>
 <body class="bg-white text-[#1E293B] font-sans antialiased selection:bg-[#2563EB] selection:text-white">
@@ -125,7 +210,24 @@
 
   <!-- React Application Logic -->
   <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    function useAppleFadeIn() {
+      const ref = useRef(null);
+      useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (mq.matches) { el.classList.add('visible'); return; }
+        const observer = new IntersectionObserver(
+          ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); observer.unobserve(el); } },
+          { threshold: 0.12 }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+      }, []);
+      return ref;
+    }
 
     const ALL_CITIES = [
       'Bengaluru', 'Mysuru', 'Mangaluru', 'Hubballi-Dharwad', 'Shivamogga',
@@ -294,23 +396,23 @@
             href="https://wa.me/919876543210?text=Hi%20Hassan%20Packers,%20I%20want%20a%20quote"
             target="_blank"
             rel="noreferrer"
-            className="fixed bottom-20 lg:bottom-6 right-4 z-40 w-14 h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg shadow-emerald-500/30 flex items-center justify-center transition-all hover:scale-110"
+            className="apple-press fixed bottom-20 lg:bottom-6 right-4 z-40 w-14 h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg shadow-emerald-500/30 flex items-center justify-center"
             aria-label="Chat on WhatsApp"
           >
             <i data-lucide="message-circle" className="w-7 h-7"></i>
           </a>
 
           {/* Mobile Sticky Bottom CTA Bar */}
-          <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white border-t border-slate-200 shadow-[0_-4px_12px_rgba(0,0,0,0.1)] px-4 py-3 flex gap-3">
+          <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden glass-nav border-t border-white/40 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] px-4 py-3 flex gap-3">
             <a
               href="tel:+919876543210"
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#1E293B] text-white font-bold text-sm"
+              className="apple-press flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#1E293B] text-white font-bold text-sm"
             >
               <i data-lucide="phone" className="w-4 h-4"></i> Call Now
             </a>
             <button
               onClick={() => { const el = document.getElementById('hero-stage'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2563EB] text-white font-bold text-sm"
+              className="apple-press flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2563EB] text-white font-bold text-sm"
             >
               <i data-lucide="calendar" className="w-4 h-4"></i> Book Now
             </button>
@@ -329,8 +431,8 @@
       };
 
       return (
-        <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-xs">
-          <div className="bg-[#1E293B] text-slate-300 text-xs py-1.5 px-4">
+        <header className="sticky top-0 z-50 glass-nav border-b border-white/40 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <div className="glass-nav-dark text-slate-300 text-xs py-1.5 px-4">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1 text-emerald-400 font-semibold">
@@ -365,12 +467,12 @@
               </div>
 
               <nav className="hidden lg:flex items-center gap-7 text-sm font-semibold text-slate-600">
-                <button onClick={() => handleNavClick('hero-stage')} className="hover:text-[#2563EB] transition-colors">Home</button>
-                <button onClick={() => handleNavClick('how-it-works')} className="hover:text-[#2563EB] transition-colors">How It Works</button>
-                <button onClick={() => handleNavClick('why-us')} className="hover:text-[#2563EB] transition-colors">Why Choose Us</button>
-                <button onClick={() => handleNavClick('about')} className="hover:text-[#2563EB] transition-colors">About Us</button>
-                <button onClick={() => handleNavClick('reviews')} className="hover:text-[#2563EB] transition-colors">Reviews</button>
-                <button onClick={() => handleNavClick('contact')} className="hover:text-[#2563EB] transition-colors">Contact</button>
+                <button onClick={() => handleNavClick('hero-stage')} className="apple-press hover:text-[#2563EB] transition-colors px-2 py-1 rounded-lg">Home</button>
+                <button onClick={() => handleNavClick('how-it-works')} className="apple-press hover:text-[#2563EB] transition-colors px-2 py-1 rounded-lg">How It Works</button>
+                <button onClick={() => handleNavClick('why-us')} className="apple-press hover:text-[#2563EB] transition-colors px-2 py-1 rounded-lg">Why Choose Us</button>
+                <button onClick={() => handleNavClick('about')} className="apple-press hover:text-[#2563EB] transition-colors px-2 py-1 rounded-lg">About Us</button>
+                <button onClick={() => handleNavClick('reviews')} className="apple-press hover:text-[#2563EB] transition-colors px-2 py-1 rounded-lg">Reviews</button>
+                <button onClick={() => handleNavClick('contact')} className="apple-press hover:text-[#2563EB] transition-colors px-2 py-1 rounded-lg">Contact</button>
               </nav>
 
               <div className="flex items-center gap-3">
@@ -522,10 +624,10 @@
               <span className="text-xs font-extrabold uppercase tracking-wider text-[#2563EB] bg-[#EAF4FF] px-4 py-1.5 rounded-full border border-blue-200">
                 Hassan Packers &amp; Movers
               </span>
-              <h1 className="text-2xl sm:text-3xl lg:text-5xl font-black text-[#1E293B]">
+              <h1 className="text-2xl sm:text-3xl lg:text-5xl font-black text-[#1E293B] apple-display">
                 Safe &amp; Reliable Shifting Services
               </h1>
-              <p className="text-slate-500 text-base sm:text-sm font-medium">
+              <p className="text-slate-500 text-base sm:text-sm font-medium" style={{letterSpacing: '0.01em', lineHeight: '1.6'}}>
                 Professional household moving within Hassan and to any city across India.
               </p>
 
@@ -633,7 +735,7 @@
               {/* RIGHT STAGE: ALL BOOKING OPTIONS REVEAL AS USER SCROLLS */}
               <div className="lg:col-span-7">
                 <div 
-                  className="bg-white rounded-3xl shadow-2xl border-2 border-slate-200/80 p-6 sm:p-8 relative"
+                  className="glass-card rounded-3xl shadow-2xl border border-white/60 p-6 sm:p-8 relative ring-1 ring-black/[0.04]"
                   style={{
                     opacity: optionsOpacity,
                     transform: `translateY(${optionsYOffset}px) scale(${optionsScale})`,
@@ -932,7 +1034,7 @@
           <div className="pt-2 flex justify-end">
             <button
               type="submit"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-extrabold text-sm shadow-xl flex items-center justify-center gap-2"
+              className="apple-press w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-extrabold text-sm shadow-xl flex items-center justify-center gap-2"
             >
               Next Step: Select Inventory ➔
             </button>
@@ -1029,7 +1131,7 @@
             <button onClick={onPrev} className="px-5 py-2.5 rounded-2xl border border-slate-200 text-slate-700 font-bold text-xs">
               ➔ Previous
             </button>
-            <button onClick={onNext} className="px-7 py-3 rounded-2xl bg-[#2563EB] text-white font-extrabold text-xs shadow-lg">
+            <button onClick={onNext} className="apple-press px-7 py-3 rounded-2xl bg-[#2563EB] text-white font-extrabold text-xs shadow-lg">
               Review &amp; Pay ➔
             </button>
           </div>
@@ -1084,7 +1186,7 @@
               </div>
               <button
                 onClick={onOpenPayModal}
-                className="w-full py-3.5 rounded-2xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-extrabold text-sm shadow-lg"
+                className="apple-press w-full py-3.5 rounded-2xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-extrabold text-sm shadow-lg"
               >
                 Pay Advance ₹500 &amp; Confirm Move
               </button>
@@ -1116,8 +1218,8 @@
       };
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-modal-bg">
+          <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl shadow-black/20 overflow-hidden border border-white/60 ring-1 ring-black/[0.05]">
             <div className="bg-[#1E293B] p-5 text-white flex justify-between items-center">
               <div>
                 <h3 className="font-bold text-sm">Razorpay Payment Gateway</h3>
@@ -1175,7 +1277,7 @@
               <button
                 type="submit"
                 disabled={isPaying}
-                className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-lg"
+                className="apple-press w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-lg"
               >
                 {isPaying ? 'Processing Payment...' : 'Pay Advance ₹500'}
               </button>
@@ -1211,8 +1313,8 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
       };
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
-          <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 glass-modal-bg">
+          <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl shadow-black/20 overflow-hidden border border-white/60 ring-1 ring-black/[0.05]">
             <div className="bg-emerald-600 p-6 text-white text-center">
               <h2 className="text-2xl font-black">Booking Successful! 🎉</h2>
               <p className="text-emerald-100 text-xs mt-1">Advance token of ₹500 confirmed.</p>
@@ -1264,6 +1366,7 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
 
     // --- HOW IT WORKS SECTION ---
     function HowItWorksSection() {
+      const fadeRef = useAppleFadeIn();
       const steps = [
         { num: 'Step 1', title: 'Book Your Move', desc: 'Fill shifting details online, select items, and pay ₹500 advance.' },
         { num: 'Step 2', title: 'We Contact You', desc: 'Our Hassan shift manager calls to verify schedule and assign dedicated crew.' },
@@ -1272,25 +1375,25 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
       ];
 
       return (
-        <section id="how-it-works" className="py-20 bg-slate-50 border-t border-slate-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="how-it-works" className="py-20 bg-slate-50/80 border-t border-slate-100/60">
+          <div ref={fadeRef} className="apple-fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto space-y-3 mb-16">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB] bg-blue-100 px-3 py-1 rounded-full">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB] bg-blue-100/70 px-3 py-1 rounded-full">
                 Simple &amp; Transparent
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1E293B]">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1E293B] apple-title">
                 How Hassan Packers &amp; Movers Works
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {steps.map((s, i) => (
-                <div key={i} className="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 space-y-3">
+                <div key={i} className="apple-lift bg-white p-6 rounded-3xl shadow-lg shadow-black/[0.04] border border-slate-100/80 space-y-3">
                   <span className="text-xs font-extrabold px-3 py-1 bg-[#EAF4FF] text-[#2563EB] rounded-full">
                     {s.num}
                   </span>
-                  <h3 className="text-lg font-bold text-[#1E293B] pt-2">{s.title}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">{s.desc}</p>
+                  <h3 className="text-lg font-bold text-[#1E293B] pt-2 apple-title">{s.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed" style={{letterSpacing: '0.005em'}}>{s.desc}</p>
                 </div>
               ))}
             </div>
@@ -1301,6 +1404,7 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
 
     // --- WHY CHOOSE US SECTION ---
     function WhyChooseUsSection() {
+      const fadeRef = useAppleFadeIn();
       const cards = [
         { title: 'Experienced Team', desc: '10+ years local & intercity shifting experience in Karnataka.' },
         { title: 'Safe Packing', desc: 'Multi-layer bubble wrap, corrugated sheets & custom crating.' },
@@ -1312,18 +1416,18 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
 
       return (
         <section id="why-us" className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div ref={fadeRef} className="apple-fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto space-y-3 mb-16">
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1E293B]">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1E293B] apple-title">
                 Why Choose Hassan Packers &amp; Movers
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {cards.map((c, i) => (
-                <div key={i} className="p-7 rounded-3xl bg-slate-50 border border-slate-200/80 hover:shadow-xl transition-all">
-                  <h3 className="text-lg font-bold text-[#1E293B] mb-2">{c.title}</h3>
-                  <p className="text-xs text-slate-600 leading-relaxed">{c.desc}</p>
+                <div key={i} className="apple-lift p-7 rounded-3xl bg-slate-50/70 border border-slate-200/60 ring-1 ring-black/[0.03]">
+                  <h3 className="text-lg font-bold text-[#1E293B] mb-2 apple-title">{c.title}</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed" style={{letterSpacing: '0.005em'}}>{c.desc}</p>
                 </div>
               ))}
             </div>
@@ -1334,23 +1438,24 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
 
     // --- ABOUT US SECTION ---
     function AboutUsSection() {
+      const fadeRef = useAppleFadeIn();
       return (
-        <section id="about" className="py-20 bg-slate-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="about" className="py-20 bg-slate-50/80">
+          <div ref={fadeRef} className="apple-fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               <div className="lg:col-span-6">
                 <img
                   src="./movers_hero.jpg"
                   alt="Hassan Packers & Movers Team"
-                  className="rounded-3xl shadow-2xl border-4 border-white w-full h-[380px] object-cover"
+                  className="rounded-3xl shadow-2xl shadow-black/10 border-4 border-white w-full h-[380px] object-cover"
                 />
               </div>
 
               <div className="lg:col-span-6 space-y-5">
-                <span className="text-xs font-bold text-[#2563EB] bg-blue-100 px-3 py-1 rounded-full">
+                <span className="text-xs font-bold text-[#2563EB] bg-blue-100/70 px-3 py-1 rounded-full">
                   Based in Hassan, Karnataka
                 </span>
-                <h2 className="text-3xl font-black text-[#1E293B]">
+                <h2 className="text-3xl font-black text-[#1E293B] apple-display">
                   Hassan Packers &amp; Movers
                 </h2>
                 <p className="text-slate-600 text-sm leading-relaxed">
@@ -1370,11 +1475,12 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
 
     // --- TESTIMONIALS SECTION ---
     function TestimonialsSection() {
+      const fadeRef = useAppleFadeIn();
       return (
         <section id="reviews" className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div ref={fadeRef} className="apple-fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto space-y-3 mb-16">
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1E293B]">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1E293B] apple-title">
                 Customer Reviews
               </h2>
             </div>
@@ -1384,7 +1490,7 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
                 { name: 'Suhas K. Swamy', loc: 'Kuvempu Nagar, Hassan', type: 'Hassan to Bengaluru', comment: 'Exceptional service! The team arrived on time in Hassan, carefully bubble-wrapped all delicate wooden furniture.' },
                 { name: 'Meena & Vijay Kumar', loc: 'BM Road, Hassan', type: 'Within Hassan City Move', comment: 'We shifted our 3 BHK house within Hassan city. Hassan Packers & Movers handled our fridge effortlessly across 3 floors.' }
               ].map((r, idx) => (
-                <div key={idx} className="p-7 rounded-3xl bg-slate-50 border border-slate-200/80 space-y-4">
+                <div key={idx} className="apple-lift p-7 rounded-3xl bg-slate-50/70 border border-slate-200/60 ring-1 ring-black/[0.03] space-y-4">
                   <div className="text-amber-400 font-bold">★★★★★</div>
                   <p className="text-xs text-slate-700 italic">"{r.comment}"</p>
                   <div className="flex justify-between items-center pt-2 border-t text-xs">
@@ -1404,17 +1510,18 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
 
     // --- CONTACT SECTION ---
     function ContactSection() {
+      const fadeRef = useAppleFadeIn();
       return (
-        <section id="contact" className="py-20 bg-slate-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-[#2563EB] text-white p-8 sm:p-12 rounded-3xl shadow-2xl flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
+        <section id="contact" className="py-20 bg-slate-50/80">
+          <div ref={fadeRef} className="apple-fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-[#2563EB] text-white p-8 sm:p-12 rounded-3xl shadow-2xl shadow-blue-600/20 flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
               <div>
-                <h2 className="text-3xl font-black">Need Help? Call Us Today</h2>
+                <h2 className="text-3xl font-black apple-display">Need Help? Call Us Today</h2>
                 <p className="text-blue-100 text-xs mt-1">Our Hassan office team is ready to assist you 24/7.</p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                <a href="tel:+919876543210" className="px-6 py-3.5 bg-white text-[#2563EB] font-extrabold rounded-2xl shadow text-center">Call Now</a>
-                <a href="https://wa.me/919876543210" target="_blank" className="px-6 py-3.5 bg-emerald-500 text-white font-extrabold rounded-2xl shadow text-center">WhatsApp</a>
+                <a href="tel:+919876543210" className="apple-press px-6 py-3.5 bg-white text-[#2563EB] font-extrabold rounded-2xl shadow text-center">Call Now</a>
+                <a href="https://wa.me/919876543210" target="_blank" className="apple-press px-6 py-3.5 bg-emerald-500 text-white font-extrabold rounded-2xl shadow text-center">WhatsApp</a>
               </div>
             </div>
 
@@ -1424,7 +1531,7 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
                 <input type="text" placeholder="Your Name" className="w-full px-4 py-3 border rounded-xl text-xs" />
                 <input type="tel" placeholder="Mobile Number" className="w-full px-4 py-3 border rounded-xl text-xs" />
                 <textarea rows={3} placeholder="Requirements..." className="w-full px-4 py-3 border rounded-xl text-xs"></textarea>
-                <button className="w-full py-3.5 bg-[#2563EB] text-white font-bold rounded-2xl">Send Request</button>
+                <button className="apple-press w-full py-3.5 bg-[#2563EB] text-white font-bold rounded-2xl">Send Request</button>
               </div>
 
               <div className="lg:col-span-6 rounded-3xl overflow-hidden border shadow-sm h-72">
@@ -1443,7 +1550,7 @@ Advance Paid: ₹${booking.cost.advance} (SUCCESS)
     // --- FOOTER SECTION ---
     function FooterSection({ onScrollTo, onOpenAdmin }) {
       return (
-        <footer className="bg-[#1E293B] text-slate-400 py-12 pb-24 lg:pb-12 text-xs border-t border-slate-800">
+        <footer className="bg-[#1E293B] text-slate-400 py-12 pb-24 lg:pb-12 text-xs border-t border-slate-700/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
               <p className="font-bold text-white text-base">HASSAN PACKERS &amp; MOVERS</p>
